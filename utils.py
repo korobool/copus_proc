@@ -12,10 +12,14 @@ def replace_punctuation(sentence):
                     '\[': ' [ ',
                     '\]': ' ] ',
                     ':': ' : ',
-                    }
+                    # r'[\s]+': ' ',
+                    # r'[\t]+': ' ',
+
+    }
     for replacement in replacements:
         line = re.sub(replacement, replacements[replacement], line)
     return line
+
 
 def preprocess(text):
     # FIXME: Select more appropriate substitutions (probably EMPTY ?)
@@ -25,7 +29,14 @@ def preprocess(text):
         '\sт[\.]*д[\.]*\s': '',  # ' так далее ',
         '\sт[\.]*е[\.]*\s': '',  # ' то есть ',
         '\sт[\.]*к[\.]*\s': '',  # ' так как ',
-        '\sч[\.]*т[\.]*д[\.]*\s': ''  # что и требовалось доказать ',
+        '\sч[\.]*т[\.]*д[\.]*\s': '',  # что и требовалось доказать ',
+        '-\n': ' ',
+        '\n': ' ',
+        '\r': '',
+        r'\\': '',
+        r'[\s]+': ' ',
+        r'[\t]+': ' ',
+
     }
     txt = text.lower()
     for subst in substitutions:
@@ -40,16 +51,3 @@ def enum_files(input_path):
             yield os.path.join(dirname, filename)
 
 
-def get_rus_sentences_flom_habra_files_list(files_list):
-    for file in files_list:
-        try:
-            text = yaml.load(open(file).read())['text']
-            text = preprocess(text)
-            matches = re.finditer(r'^[А-Яа-я\s\n,!"\']+\.', text)
-            for m in matches:
-                multiline = m.group(0)
-                singleline = multiline  # ''.join(multiline.splitlines())
-
-                yield singleline
-        except:
-            print(file, 'cannot be processed')
