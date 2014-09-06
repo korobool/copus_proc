@@ -9,13 +9,17 @@ def get_rus_sentences_flom_files_list(files_list):
         try:
             text = open(file).read()
             #text = preprocess(text)
-            matches = re.finditer(r'[А-Я][А-Яа-я\s\n,!-]+\.', text)
+            matches = re.finditer(r'[А-Я][А-Яа-я\s\n,-]+[\.|!|?]', text)
             for m in matches:
                 multiline = m.group(0)
-                step1 = re.sub('-\n', '', multiline)
-                step2 = re.sub('\n', ' ', step1)
-
-                yield step2
+                line = re.sub('-\n', '', multiline)
+                line = re.sub('\n', ' ', line)
+                line = re.sub('[-]+', '-', line)
+                line = re.sub('[\s]+', ' ', line)
+                line = re.sub('[\t]+', ' ', line)
+                line = re.sub('[,] -', ', ', line)
+                line = re.sub('[:] -', ': ', line)
+                yield line
         except:
             print(file, 'cannot be processed')
 

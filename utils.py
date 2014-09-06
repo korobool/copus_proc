@@ -12,6 +12,7 @@ def replace_punctuation(sentence):
                     '\[': ' [ ',
                     '\]': ' ] ',
                     ':': ' : ',
+                    '--': ' - '
                     # r'[\s]+': ' ',
                     # r'[\t]+': ' ',
 

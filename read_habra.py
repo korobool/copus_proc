@@ -8,16 +8,20 @@ def get_rus_sentences_flom_habra_files_list(files_list):
     for file in files_list:
         try:
             text = yaml.load(open(file).read())['text']
-            text = preprocess(text)
-            matches = re.finditer(r'[А-Я][А-Яа-я\s\n,!-]+\.', text)
+            #text = preprocess(text)
+            matches = re.finditer(r'[А-Я][А-Яа-я\s\n,-]+[\.|!|?]', text)
             for m in matches:
                 multiline = m.group(0)
-                step1 = re.sub('-\n', '', multiline)
-                step2 = re.sub('\n', ' ', step1)
-
-                yield re.sub('\n', '', step2)
+                line = re.sub('-\n', '', multiline)
+                line = re.sub('\n', ' ', line)
+                line = re.sub('[-]+', '-', line)
+                line = re.sub('[\s]+', ' ', line)
+                line = re.sub('[\t]+', ' ', line)
+                line = re.sub('[,] -', ', ', line)
+                line = re.sub('[:] -', ': ', line)
+                yield line
         except:
-            print(file, 'cannot be processed')
+            pass  # print(file, 'cannot be processed')
 
 
 def enumerate_habra(input_path):

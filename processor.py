@@ -1,5 +1,4 @@
 import sys
-import pymongo
 import pymorphy2
 from utils import *
 
@@ -9,11 +8,7 @@ class CorpusProcessor():
         self.punct = punct
         self.pos = pos
         self.morph = pymorphy2.MorphAnalyzer()
-        # self.pos_templates = {}
-
-        conn = pymongo.Connection('localhost', 27017)
-        pos = conn.pos
-        self.templates = pos.templates
+        self.pos_templates = {}
         self.max_length = max_length
 
     def _megre_pos(self, parsed_pos):
@@ -52,17 +47,13 @@ class CorpusProcessor():
                     tags.append('XXXX')
         return tuple(tags)
 
-    def _put(self, pos_tagged, line):
-        tpl = self.templates.find_one({'tp': pos_tagged})
-        if not tpl:
-            self.templates.insert({'tp': tpl, 't': [line, ]})
-        else:
-            self.templates.update({'_id': tpl['_id']}, {'$push': {'t': line}}, upsert=False)
-
     def _load_sentence(self, line):
         if len(line) <= self.max_length:
             pos_tagged = self._pos_tag_rus(line)
-            self._put(pos_tagged, line)
+            if pos_tagged in self.pos_templates:
+                self.pos_templates[pos_tagged].append(line)
+            else:
+                self.pos_templates[pos_tagged] = [line]
 
     def load_stdin(self):
         for line in sys.stdin:
@@ -71,16 +62,14 @@ class CorpusProcessor():
     def analyze(self, report_path='./'):
         os.system('mkdir -p {}'.format(report_path))
         report = os.path.join(report_path, 'report.txt')
-
-        for pos_template in self.templates.find():
-            print(len(pos_template['t']), pos_template['tp'])
-
-        # with open(report, 'w') as outfile:
-        #     for val in self.pos_templates:
-        #         outfile.write(str(len(self.pos_templates[val])) + ' => ' + repr(val) + '\n')
-        #         with open(os.path.join(report_path, str(val)), 'a') as f:
-        #             f.write(repr(self.pos_templates[val]))
+        with open(report, 'w') as outfile:
+            for val in self.pos_templates:
+                outfile.write(str(len(self.pos_templates[val])) + ' => ' + repr(val) + '\n')
+                try:
+                    with open(os.path.join(report_path, str(val)), 'a') as f:
+                        f.write(repr(self.pos_templates[val]))
+                except Exception as ex:
+                    print('Cannot process file: {}'.format(ex))
         # sort -k1.1n report.txt | tac > 0a_ordered_templates.txt
-        # os.system('cd {} && sort -k1.1n report.txt | tac > 0a_ordered_templates.txt'.format(report_path))
-
+        os.system('cd {} && sort -k1.1n report.txt | tac > 0a_ordered_templates.txt'.format(report_path))
 
