@@ -21,7 +21,7 @@ def get_rus_sentences_flom_files_list(files_list):
                 line = re.sub('[:] -', ': ', line)
                 yield line
         except:
-            print(file, 'cannot be processed')
+            pass  # print(file, 'cannot be processed')
 
 
 def enumerate_habra(input_path):
