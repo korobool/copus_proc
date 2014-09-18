@@ -17,7 +17,7 @@ class CorpusProcessor():
             'ADJF': 'ADJC',  # ADJC - common class for ADJF and ADJS
             'ADJS': 'ADJC',
             'COMP': 'ADVB',
-            'INFN': 'VREB',
+            # 'INFN': 'VREB',
             'PRTF': 'ADJC',
             'PRTS': 'ADJC',
             'GRND': 'VERB',
@@ -60,16 +60,22 @@ class CorpusProcessor():
             self._load_sentence(line)
 
     def analyze(self, report_path='./'):
+
         os.system('mkdir -p {}'.format(report_path))
         report = os.path.join(report_path, 'report.txt')
+
+        pr = (lambda template: len(set(template)-set(self.punct)) > 4 and not 'XXXX' in set(template))
+
         with open(report, 'w') as outfile:
             for val in self.pos_templates:
-                outfile.write(str(len(self.pos_templates[val])) + ' => ' + repr(val) + '\n')
-                try:
-                    with open(os.path.join(report_path, str(val)), 'a') as f:
-                        f.write(repr(self.pos_templates[val]))
-                except Exception as ex:
-                    print('Cannot process file: {}'.format(ex))
+                # print()
+                if pr(val):
+                    outfile.write(str(len(self.pos_templates[val])) + ' => ' + repr(val) + '\n')
+                    try:
+                        with open(os.path.join(report_path, str(val)), 'a') as f:
+                            f.write(repr(self.pos_templates[val]))
+                    except Exception as ex:
+                        print('Cannot process file: {}'.format(ex))
         # sort -k1.1n report.txt | tac > 0a_ordered_templates.txt
         os.system('cd {} && sort -k1.1n report.txt | tac > 0a_ordered_templates.txt'.format(report_path))
 
