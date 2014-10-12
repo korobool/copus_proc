@@ -17,7 +17,7 @@ class CorpusProcessor():
             'ADJF': 'ADJC',  # ADJC - common class for ADJF and ADJS
             'ADJS': 'ADJC',
             'COMP': 'ADVB',
-            # 'INFN': 'VREB',
+            #'INFN': 'VERB',
             'PRTF': 'ADJC',
             'PRTS': 'ADJC',
             'GRND': 'VERB',

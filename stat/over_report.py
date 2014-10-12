@@ -1,5 +1,6 @@
 from pprint import pprint
 import statistics
+import sys
 
 
 def parse_line(line):
@@ -44,8 +45,6 @@ with open('/home/oleksandr/tmp/l4pos_report_tail1000000/0a_ordered_templates.txt
 #         c3[item[0]] = item[1]
 
 
-import numpy as np
-
 norm1 = statistics.stdev(c1.values())
 norm2 = statistics.stdev(c2.values())
 norm3 = statistics.stdev(c3.values())
@@ -74,15 +73,16 @@ items.sort(key=lambda entry: entry[1][0] + entry[1][1]  # reverse=True)
 
 
 def report():
-    with open('over_report.txt', 'w') as report:
+    for i in items:
+        yield ((i[1][0] + i[1][1] + i[1][2]) / 3, i[1][0], i[1][1], i[1][2])
 
+if len(sys.argv) > 0:
+    with open(sys.argv[1], 'w') as report:
         for i in items:
-            # yield ((i[1][0] + i[1][1])/2, i[1][0], i[1][1])
-            report.write('{0}\t{1}\t{2}\t{3}\t{4}\n'.format(i[0], (i[1][0] + i[1][1] + i[1][2]) / 3, i[1][0], i[1][1], i[1][2] ))
-            yield ((i[1][0] + i[1][1] + i[1][2]) / 3, i[1][0], i[1][1], i[1][2])
+            report.write('{0},{1},{2},{3}'.format(repr(i[0]), i[1][0], i[1][1], i[1][2]) + '\n')
 
 from plot_report import plot_rep
 
 plot_rep(list(report()))
 
-pprint(list(report()))
+# pprint(list(report()))
