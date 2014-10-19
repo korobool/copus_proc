@@ -9,7 +9,7 @@ def get_rus_sentences_flom_files_list(files_list):
         try:
             text = open(file).read()
             #text = preprocess(text)
-            matches = re.finditer(r'[А-Я][А-Яа-я\s\n,-]+[\.|!|?]', text)
+            matches = re.finditer(r'[A-Z][A-Za-z\s\n,-]+[\.|!|?]', text)
             for m in matches:
                 multiline = m.group(0)
                 line = re.sub('-\n', '', multiline)
